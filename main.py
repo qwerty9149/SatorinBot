@@ -157,7 +157,7 @@ async def guya(ctx, c):
         txt = r.text
         x = txt.find(whereguya)
         if x != -1:
-          await ctx.channel.send("new guya pog <@371125260634030080>")
+          await ctx.channel.send("new guya pog <@371125260634030080>\n\nhttps://www.facebook.com/anime.kaguya.comic/\n\ncompleted in " + str(i) + " reps")
           break
         newhour = str((int(time.strftime("%H")) + 8) % 24).zfill(2)
         await ctx.channel.send("still no new guya at time " + str(newhour) + time.strftime(":%M:%S") + "; rep number: " + str(i), delete_after=60)
@@ -182,7 +182,7 @@ async def zaibatsu(ctx, c):
             cookies=cookies)
         code = int(r.status_code)
         if code == 200:
-          await ctx.channel.send("new zaibatsu pog <@371125260634030080>\nhttps://guya.moe/read/manga/Kaguya-Wants-To-Be-Confessed-To/" + str(chno) + "/1/")
+          await ctx.channel.send("new zaibatsu pog <@371125260634030080>\nhttps://guya.moe/read/manga/Kaguya-Wants-To-Be-Confessed-To/" + str(chno) + "/1/\n\ncompleted in " + str(i) + " reps")
           break
         newhour = str((int(time.strftime("%H")) + 8) % 24).zfill(2)
         await ctx.channel.send("still no new zaibatsu at time " + str(newhour) + time.strftime(":%M:%S") + "; rep number: " + str(i), delete_after=60)
