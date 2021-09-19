@@ -9,6 +9,8 @@ from keep_alive import keep_alive
 import random
 import asyncio
 import cloudscraper
+from bs4 import BeautifulSoup
+import re
 
 logging.basicConfig(level=logging.INFO)
 
@@ -135,15 +137,14 @@ async def timenow(ctx, arg=""):
 @bot.command()
 async def help(context):
     await context.send(
-        "__**!wacca**__: input your scores in the form `!wacca a b c d`, where:\na: Marvelous notes\nb: Great notes\nc: Good notes\nd: Miss notes\n\n__**!waccar**__: input your scores in the form `!waccar a b c d e f g h`, where:\na: Marvelous notes\nb: Great notes\nc: Good notes\nd: Miss notes\ne: Marvelous R notes\nf: Great R notes\ng: Good R notes\nh: Miss R notes\n\n__**!ping**__: pong (makes sure bot isn't dead)\n\n__**!guya n**__: pings kaguya-sama tieba every minute to check for kaguya-sama CN scan of chapter n, pings @masahiro if new scan is out (unstoppable and disables bot, beware; prone to random crashes after a few hundred reps)\n\n__**!zaibatsu n**__: same as above but with zaibatsu on guya.moe instead\n\n__**!rand n**__: randomly generates integer from 1 to n\n\n__**!timenow**__: displays current time in HKT"
+        "__**!wacca**__: input your scores in the form `!wacca a b c d`, where:\na: Marvelous notes\nb: Great notes\nc: Good notes\nd: Miss notes\n\n__**!waccar**__: input your scores in the form `!waccar a b c d e f g h`, where:\na: Marvelous notes\nb: Great notes\nc: Good notes\nd: Miss notes\ne: Marvelous R notes\nf: Great R notes\ng: Good R notes\nh: Miss R notes\n\n__**!ping**__: pong (makes sure bot isn't dead)\n\n__**!guya n**__: pings manatoki every minute to check for kaguya-sama KR scan of chapter n (n < 10), pings @masahiro with link if scan is out (unstoppable and disables bot, beware; prone to random crashes after a few dozen few hundred reps)\n\n__**!zaibatsu n**__: same as above but with zaibatsu on guya.moe instead\n\n__**!rand n**__: randomly generates integer from 1 to n\n\n__**!timenow**__: displays current time in HKT"
     )
 
 
 @bot.command()
 async def guya(ctx, c):
-  try:
     chno = str(int(c) - 10)
-    whereguya = "카구야 님은 고백받고 싶어 ~천재들의 연애 두뇌전~ " + str(chno) + "화"
+    whereguya = " " + chno + "화"
     i = 0
     while i > -1:
         scraper = cloudscraper.create_scraper(browser={
@@ -154,14 +155,18 @@ async def guya(ctx, c):
         txt = scraper.get("https://manatoki106.net/comic/118798").text
         x = txt.find(whereguya)
         if x != -1:
-          await ctx.channel.send("new guya pog <@371125260634030080>\n\nhttps://manatoki106.net/comic/118798\n\ncompleted in " + str(i) + " reps")
+          soup = BeautifulSoup(txt, "html.parser")
+          links = soup.find_all('a')
+          for link in links:
+            if link.find(text=re.compile(whereguya)):
+              thelink = link
+              break
+          await ctx.channel.send("new guya pog <@371125260634030080>\n" + thelink.get('href')[:-8] + "\ncompleted in " + str(i) + " reps")
           break
         newhour = str((int(time.strftime("%H")) + 8) % 24).zfill(2)
         await ctx.channel.send("still no new guya at time " + str(newhour) + time.strftime(":%M:%S") + "; rep number: " + str(i), delete_after=60)
         await asyncio.sleep(60)
         i += 1
-  except TypeError:
-    await ctx.channel.send("Needs an integer ah on9!")
 
 @bot.command()
 async def zaibatsu(ctx, c):
