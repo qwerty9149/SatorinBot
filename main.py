@@ -8,6 +8,7 @@ from itertools import cycle
 from keep_alive import keep_alive
 import random
 import asyncio
+import cloudscraper
 
 logging.basicConfig(level=logging.INFO)
 
@@ -142,28 +143,24 @@ async def help(context):
 async def guya(ctx, c):
   try:
     chno = str(int(c) - 10)
-    whereguya = "辉夜大小姐想让我告白 " + chno + "话"
+    whereguya = "카구야 님은 고백받고 싶어 ~천재들의 연애 두뇌전~ " + str(chno) + "화"
     i = 0
     while i > -1:
-        headers = {
-            'user-agent':
-            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.63 Safari/537.36'
-        }
-        cookies = dict(cookies_are='working')
-        r = requests.get(
-            'https://tieba.baidu.com/f?kw=%E8%BE%89%E5%A4%9C%E5%A4%A7%E5%B0%8F%E5%A7%90%E6%83%B3%E8%AE%A9%E6%88%91%E5%91%8A%E7%99%BD&ie=utf-8',
-            headers=headers,
-            cookies=cookies)
-        txt = r.text
+        scraper = cloudscraper.create_scraper(browser={
+        'browser': 'firefox',
+        'platform': 'windows',
+        'mobile': False
+        }) 
+        txt = scraper.get("https://manatoki106.net/comic/118798").text
         x = txt.find(whereguya)
         if x != -1:
-          await ctx.channel.send("new guya pog <@371125260634030080>\n\nhttps://www.facebook.com/anime.kaguya.comic/\n\ncompleted in " + str(i) + " reps")
+          await ctx.channel.send("new guya pog <@371125260634030080>\n\nhttps://manatoki106.net/comic/118798\n\ncompleted in " + str(i) + " reps")
           break
         newhour = str((int(time.strftime("%H")) + 8) % 24).zfill(2)
         await ctx.channel.send("still no new guya at time " + str(newhour) + time.strftime(":%M:%S") + "; rep number: " + str(i), delete_after=60)
         await asyncio.sleep(60)
         i += 1
-  except:
+  except TypeError:
     await ctx.channel.send("Needs an integer ah on9!")
 
 @bot.command()
