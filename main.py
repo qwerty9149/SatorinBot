@@ -137,31 +137,46 @@ async def timenow(ctx, arg=""):
 @bot.command()
 async def help(context):
     await context.send(
-        "__**!wacca**__: input your scores in the form `!wacca a b c d`, where:\na: Marvelous notes\nb: Great notes\nc: Good notes\nd: Miss notes\n\n__**!waccar**__: input your scores in the form `!waccar a b c d e f g h`, where:\na: Marvelous notes\nb: Great notes\nc: Good notes\nd: Miss notes\ne: Marvelous R notes\nf: Great R notes\ng: Good R notes\nh: Miss R notes\n\n__**!ping**__: pong (makes sure bot isn't dead)\n\n__**!guya n**__: pings manatoki every minute to check for kaguya-sama KR scan of chapter n (n < 10), pings @masahiro with link if scan is out (unstoppable and disables bot, beware; prone to random crashes after a few dozen few hundred reps)\n\n__**!zaibatsu n**__: same as above but with zaibatsu on guya.moe instead\n\n__**!rand n**__: randomly generates integer from 1 to n\n\n__**!timenow**__: displays current time in HKT"
+        "__**!wacca**__: input your scores in the form `!wacca a b c d`, where:\na: Marvelous notes\nb: Great notes\nc: Good notes\nd: Miss notes\n\n__**!waccar**__: input your scores in the form `!waccar a b c d e f g h`, where:\na: Marvelous notes\nb: Great notes\nc: Good notes\nd: Miss notes\ne: Marvelous R notes\nf: Great R notes\ng: Good R notes\nh: Miss R notes\n\n__**!ping**__: pong (makes sure bot isn't dead)\n\n__**!guya n**__: pings manatoki and tieba every minute to check for kaguya-sama KR/CN scans of chapter n (n < 10), pings @masahiro with link if scan is out (unstoppable and disables bot, beware; prone to random crashes after a few dozen to a few hundred reps)\n\n__**!zaibatsu n**__: same as above but with zaibatsu on guya.moe instead\n\n__**!rand n**__: randomly generates integer from 1 to n\n\n__**!timenow**__: displays current time in HKT"
     )
 
 
 @bot.command()
 async def guya(ctx, c):
     chno = str(int(c) - 10)
-    whereguya = " " + chno + "화"
+    whereguyakr = " " + chno + "화"
+    whereguyacn = "辉夜大小姐想让我告白 " + chno + "话"
     i = 0
     while i > -1:
+        headers = {
+            'user-agent':
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.63 Safari/537.36'
+        }
+        cookies = dict(cookies_are='working')
+        r = requests.get(
+            'https://tieba.baidu.com/f?kw=%E8%BE%89%E5%A4%9C%E5%A4%A7%E5%B0%8F%E5%A7%90%E6%83%B3%E8%AE%A9%E6%88%91%E5%91%8A%E7%99%BD&ie=utf-8',
+            headers=headers,
+            cookies=cookies)
+        txt2 = r.text
+        y = txt2.find(whereguyacn)
+        if y != -1:
+          await ctx.channel.send("CN scan found <@371125260634030080>\n\nhttps://www.facebook.com/anime.kaguya.comic/\n\ncompleted in " + str(i) + " reps")
+          break
         scraper = cloudscraper.create_scraper(browser={
         'browser': 'firefox',
         'platform': 'windows',
         'mobile': False
         }) 
         txt = scraper.get("https://manatoki106.net/comic/118798").text
-        x = txt.find(whereguya)
+        x = txt.find(whereguyakr)
         if x != -1:
           soup = BeautifulSoup(txt, "html.parser")
           links = soup.find_all('a')
           for link in links:
-            if link.find(text=re.compile(whereguya)):
+            if link.find(text=re.compile(whereguyakr)):
               thelink = link
               break
-          await ctx.channel.send("new guya pog <@371125260634030080>\n" + thelink.get('href')[:-8] + "\ncompleted in " + str(i) + " reps")
+          await ctx.channel.send("KR scan found <@371125260634030080>\n" + thelink.get('href')[:-8] + "\ncompleted in " + str(i) + " reps")
           break
         newhour = str((int(time.strftime("%H")) + 8) % 24).zfill(2)
         await ctx.channel.send("still no new guya at time " + str(newhour) + time.strftime(":%M:%S") + "; rep number: " + str(i), delete_after=60)
