@@ -215,11 +215,81 @@ keep_alive()
 @bot.event
 async def on_ready():
   change_status.start()
+  unpog.start()
   print('Logging in as {0.user}'.format(bot) + '...')
 
 @tasks.loop(seconds=10)
 async def change_status():
   await bot.change_presence(activity=discord.Game(next(status)))
+
+oldList = []
+theList = []
+
+def compareList(l1,l2):
+  l1.sort()
+  l2.sort()
+  if(l1==l2):
+    return True
+  else:
+    return False
+
+
+
+@tasks.loop(seconds=60)
+async def unpog():
+
+  hko = requests.get('https://data.weather.gov.hk/weatherAPI/opendata/weather.php?dataType=warnsum&lang=en')
+  parsed = json.loads(hko.text)
+  for x in parsed:
+    theList.append(parsed[x].get('code'))
+
+  listAdded = [item for item in theList if item not in oldList]
+  listRemoved = [item for item in oldList if item not in theList]
+
+  for x in parsed:
+    oldList.append(parsed[x].get('code'))
+
+  whatAddedText = ""
+  whatRemovedText = ""
+  nowHoistedText = ""
+
+  for x in theList:
+    nowHoistedText += nameDict[x]
+    nowHoistedText += ", "
+  if nowHoistedText == "":
+    nowHoistedText += "None"
+  else:
+    nowHoistedText=nowHoistedText[:-2]
+
+  for x in listAdded:
+    whatAddedText += nameDict[x]
+    whatAddedText += ", "
+  if whatAddedText == "":
+    whatAddedText += "None"
+  else:
+    whatAddedText=whatAddedText[:-2]
+
+  for x in listRemoved:
+    whatRemovedText += nameDict[x]
+    whatRemovedText += ", "
+  if whatRemovedText == "":
+    whatRemovedText += "None"
+  else:
+    whatRemovedText=whatRemovedText[:-2]
+
+  ch = bot.get_channel(895942348083691571)
+  if listAdded == [] and listRemoved == []:
+    pass
+  elif listAdded != []:
+    if listRemoved != []:
+      await ch.send(whatAddedText + " hoisted; " + whatRemovedText, " lowered.\nNow hoisted:\n" + nowHoistedText)
+    else:
+      await ch.send(whatAddedText + " hoisted.\nNow hoisted:\n" + nowHoistedText)
+  else:
+    await ch.send(whatRemovedText + " lowered.\nNow hoisted:\n" + nowHoistedText)
+  
+
+
 
 @bot.command()
 async def rand(ctx, n):
@@ -249,5 +319,8 @@ async def warnings(ctx, arg=""):
       await ctx.channel.send(whatAddedText)
   except:
     await ctx.channel.send("No warnings hoisted.")
+
+
+
 
 bot.run(os.getenv('TOKEN'))
