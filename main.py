@@ -11,6 +11,8 @@ import asyncio
 import cloudscraper
 from bs4 import BeautifulSoup
 import re
+import json
+from name import nameDict
 
 logging.basicConfig(level=logging.INFO)
 
@@ -137,7 +139,7 @@ async def timenow(ctx, arg=""):
 @bot.command()
 async def help(context):
     await context.send(
-        "__**!wacca**__: input your scores in the form `!wacca a b c d`, where:\na: Marvelous notes\nb: Great notes\nc: Good notes\nd: Miss notes\n\n__**!waccar**__: input your scores in the form `!waccar a b c d e f g h`, where:\na: Marvelous notes\nb: Great notes\nc: Good notes\nd: Miss notes\ne: Marvelous R notes\nf: Great R notes\ng: Good R notes\nh: Miss R notes\n\n__**!ping**__: pong (makes sure bot isn't dead)\n\n__**!guya n**__: pings manatoki and tieba every minute to check for kaguya-sama KR/CN scans of chapter n (n < 10), pings @masahiro with link if scan is out (unstoppable and disables bot, beware; prone to random crashes after a few dozen to a few hundred reps)\n\n__**!zaibatsu n**__: same as above but with zaibatsu on guya.moe instead\n\n__**!rand n**__: randomly generates integer from 1 to n\n\n__**!timenow**__: displays current time in HKT"
+        "__**!wacca**__: input your scores in the form `!wacca a b c d`, where:\na: Marvelous notes\nb: Great notes\nc: Good notes\nd: Miss notes\n\n__**!waccar**__: input your scores in the form `!waccar a b c d e f g h`, where:\na: Marvelous notes\nb: Great notes\nc: Good notes\nd: Miss notes\ne: Marvelous R notes\nf: Great R notes\ng: Good R notes\nh: Miss R notes\n\n__**!ping**__: pong (makes sure bot isn't dead)\n\n__**!guya n**__: pings manatoki and tieba every minute to check for kaguya-sama KR/CN scans of chapter n (n < 10), pings @masahiro with link if scan is out (unstoppable and disables bot, beware; prone to random crashes after a few dozen to a few hundred reps)\n\n__**!zaibatsu n**__: same as above but with zaibatsu on guya.moe instead\n\n__**!rand n**__: randomly generates integer from 1 to n\n\n__**!timenow**__: displays current time in HKT\n\n__**!warnings**__: displays currently hoisted weather warnings in Hong Kong"
     )
 
 
@@ -228,4 +230,24 @@ async def rand(ctx, n):
   except ValueError:
     await ctx.channel.send("Needs an integer ah 7head!")
   
+@bot.command()
+async def warnings(ctx, arg=""):
+  theList = []
+  whatAddedText= ""
+  hko = requests.get('https://data.weather.gov.hk/weatherAPI/opendata/weather.php?dataType=warnsum&lang=en')
+  try:
+    parsed = json.loads(hko.text)
+    for x in parsed:
+      theList.append(parsed[x].get('code'))
+    if theList == []:
+      await ctx.channel.send("No warnings hoisted.")
+    else:
+      for x in theList:
+        whatAddedText += nameDict[x]
+        whatAddedText += ", "
+      whatAddedText = str(whatAddedText[:-2] + " hoisted.")
+      await ctx.channel.send(whatAddedText)
+  except:
+    await ctx.channel.send("No warnings hoisted.")
+
 bot.run(os.getenv('TOKEN'))

@@ -1,0 +1,23 @@
+nameDict = {
+"WFIREY": "Fire Danger Warning (Yellow)",
+"WFIRER": "Fire Danger Warning (Red)",
+"WFROST": "Frost Warning",
+"WHOT": "Very Hot Weather Warning",
+"WCOLD": "Cold Weather Warning",
+"WMSGNL": "Strong Monsoon Signal",
+"WRAINA": "Amber Rainstorm Warning Signal",
+"WRAINR": "Red Rainstorm Warning Signal",
+"WRAINB": "Black Rainstorm Warning Signal",
+"WFNTSA": "Special Announcement (Northern NT Flooding)",
+"WL": "Landslip Warning",
+"TC1": "Typhoon Signal No. 1",
+"TC3": "Typhoon Signal No. 3",
+"TC8NE": "Typhoon Signal No. 8 (NE)",
+"TC8SE": "Typhoon Signal No. 8 (SE)",
+"TC8NW": "Typhoon Signal No. 8 (NW)",
+"TC8SW": "Typhoon Signal No. 8 (SW)",
+"TC9": "Typhoon Signal No. 9",
+"TC10": "Typhoon Signal No. 10",
+"WTMW": "Tsunami Warning",
+"WTS": "Thunderstorm Warning"
+}
